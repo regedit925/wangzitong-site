@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: wangzitong-site
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: wzt_render_secret_2025
+      - key: PORT
+        value: 10000
+    disk:
+      name: data
+      mountPath: /tmp/data
+      sizeGB: 1
