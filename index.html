@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>王梓桐 | ZITONG.WANG</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=ZCOOL+XiaoWei&family=LXGW+WenKai+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+    --pink:#f0a0c8;
+    --pink-deep:#e880b0;
+    --pink-soft:#ffd6e8;
+    --purple:#b088d0;
+    --blue:#89c4e8;
+    --green:#8ed4a8;
+    --orange:#f5c87a;
+    --bg:#fff8fb;
+    --bg2:#ffeff6;
+    --card:#ffffff;
+    --text:#444;
+    --text-light:#888;
+    --text-lighter:#aaa;
+    --border:rgba(240,160,200,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ===== 视频背景 ===== */
+.bg-video{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    object-fit:cover;z-index:-3;
+    filter:brightness(0.55) saturate(0.7) blur(3px);
+    pointer-events:none;
+}
+.bg-overlay{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:linear-gradient(135deg, rgba(255,248,251,.9) 0%, rgba(255,240,246,.88) 50%, rgba(255,248,251,.9) 100%);
+    z-index:-2;pointer-events:none;
+}
+
+/* ===== 鼠标跟随光晕 ===== */
+.cursor-glow{
+    position:fixed;width:300px;height:300px;border-radius:50%;
+    background:radial-gradient(circle, rgba(240,160,200,.15) 0%, transparent 70%);
+    pointer-events:none;z-index:-1;
+    transform:translate(-50%,-50%);
+    transition:width .3s,height .3s;
+    will-change:transform;
+}
+
+/* ===== 浮动气泡 ===== */
+.bubble{
+    position:fixed;border-radius:50%;
+    pointer-events:none;z-index:0;
+    opacity:.18;
+    animation:rise linear infinite;
+}
+@keyframes rise{
+    0%{transform:translateY(0) rotate(0deg);opacity:0}
+    10%{opacity:.18}
+    90%{opacity:.12}
+    100%{transform:translateY(-110vh) rotate(720deg);opacity:0}
+}
+
+body{
+    font-family:'ZCOOL XiaoWei','LXGW WenKai TC',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;line-height:1.75;
+}
+
+/* 装饰星星 */
+.sparkle{
+    position:fixed;pointer-events:none;z-index:0;opacity:.45;
+    width:16px;height:16px;
+    clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    animation:sFloat 4s ease-in-out infinite;
+}
+.s1{top:8%;left:5%;background:var(--pink);transform:scale(.7);animation-delay:0s}
+.s2{top:15%;right:8%;background:var(--purple);transform:rotate(20deg) scale(.55);animation-delay:.8s}
+.s3{top:45%;left:3%;background:var(--blue);transform:rotate(-15deg) scale(.6);animation-delay:1.6s}
+.s4{top:70%;right:4%;background:var(--green);transform:rotate(30deg) scale(.5);animation-delay:2.4s}
+.s5{top:90%;left:12%;background:var(--orange);transform:scale(.58);animation-delay:3.2s}
+.s6{top:38%;right:6%;background:var(--pink-deep);transform:rotate(45deg) scale(.45);animation-delay:1s}
+@keyframes sFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* 导航栏 */
+nav{
+    position:fixed;top:0;width:100%;
+    padding:14px 48px;display:flex;justify-content:space-between;align-items:center;
+    z-index:100;background:rgba(255,248,251,.85);
+    backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,160,200,.12);
+}
+.logo{
+    font-family:'ZCOOL KuaiLe',cursive;font-size:1.2em;
+    color:var(--pink-deep);letter-spacing:1px;display:flex;align-items:center;gap:6px;
+}
+.nav-links{display:flex;gap:24px;list-style:none}
+.nav-links a{
+    color:var(--text-light);text-decoration:none;font-size:.82em;font-weight:500;
+    transition:color .3s;position:relative;
+}
+.nav-links a:hover{color:var(--pink-deep)}
+
+main{position:relative;z-index:1}
+
+/* ========== 各板块通用 ========== */
+section{
+    min-height:100vh;padding:100px 60px 70px;
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;
+}
+
+/* ========== 首屏名言（升级版） ========== */
+.hero-quote{
+    min-height:100vh;text-align:center;padding:0 40px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    position:relative;z-index:1;
+}
+.quote-line{
+    width:36px;height:2px;background:linear-gradient(90deg,var(--pink),var(--purple));
+    margin-bottom:30px;border-radius:1px;
+    animation:fIn .8s .3s both;
+}
+.quote-text{
+    font-family:'LXGW WenKai TC',cursive;
+    font-size:2.2em;color:#333;line-height:1.95;max-width:720px;margin:0 auto 16px;
+    letter-spacing:3px;
+    animation:fUp 1s .5s both;
+    position:relative;
+}
+.quote-text em{
+    color:var(--pink-deep);font-style:normal;
+    background:linear-gradient(135deg,var(--pink-deep),var(--purple));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+}
+.quote-src{
+    font-size:.86em;color:var(--text-lighter);
+    letter-spacing:3px;margin-top:10px;
+    animation:fIn 1s .9s both;
+}
+.scroll-hint{
+    margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:8px;
+    animation:fIn 1s 1.3s both;
+}
+.scroll-hint span{font-size:.72em;color:var(--text-lighter);letter-spacing:3px;}
+.scroll-arrow{
+    width:12px;height:12px;border-right:2px solid var(--pink);border-bottom:2px solid var(--pink);
+    transform:rotate(45deg);animation:bDn 2s ease-in-out infinite;
+}
+@keyframes bDn{0%,100%{opacity:.4;transform:rotate(45deg) translateY(0)}50%{opacity:1;transform:rotate(45deg) translateY(7px)}}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+@keyframes fUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ========== HOME 头像区（升级版） ========== */
+.hero{text-align:center;position:relative}
+.hwrap{max-width:800px;margin:0 auto;position:relative}
+
+.av-card{
+    width:170px;height:170px;margin:0 auto 28px;position:relative;
+}
+.av-card img{
+    width:100%;height:100%;border-radius:50%;
+    object-fit:cover;border:4px solid #fff;
+    box-shadow:
+        0 0 40px rgba(240,160,200,.4),
+        0 8px 30px rgba(240,160,200,.35),
+        0 2px 8px rgba(240,160,200,.18);
+    transition:.5s cubic-bezier(.22,1,.36,1);
+    animation:aFloat 3s ease-in-out infinite;
+}
+.av-card:hover img{transform:scale(1.06)}
+@keyframes aFloat{0%,100%{box-shadow:0 0 40px rgba(240,160,200,.35),0 8px 30px rgba(240,160,200,.35),0 2px 8px rgba(240,160,200,.18)}50%{box-shadow:0 0 60px rgba(240,160,200,.5),0 12px 40px rgba(240,160,200,.45),0 4px 16px rgba(240,160,200,.22)}}
+
+.av-ring{
+    position:absolute;top:-10px;left:-10px;right:-10px;bottom:-10px;
+    border-radius:50%;border:2.5px dashed transparent;
+    border-image:linear-gradient(90deg,var(--pink),var(--purple),var(--blue)) 1;
+    -webkit-mask:radial-gradient(farthest-side,#0000 calc(98%),#000 calc(99%));
+    mask:radial-gradient(farthest-side,#0000 calc(98%),#000 calc(99%));
+    animation:spinSlow 15s linear infinite;opacity:.7;
+}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+
+/* 头像外圈发光环 */
+.av-glow-ring{
+    position:absolute;top:-22px;left:-22px;right:-22px;bottom:-22px;
+    border-radius:50%;border:1.5px solid var(--pink-soft);
+    opacity:.4;
+    animation:glowPulse 3s ease-in-out infinite alternate;
+}
+@keyframes glowPulse{
+    from{box-shadow:0 0 20px rgba(240,160,200,.2),inset 0 0 20px rgba(240,160,200,.05)}
+    to{box-shadow:0 0 40px rgba(240,160,200,.35),inset 0 0 30px rgba(240,160,200,.1);transform:scale(1.03)}
+}
+
+.greet{
+    display:inline-block;font-size:.78em;color:var(--pink-deep);
+    letter-spacing:4px;margin-bottom:12px;
+    padding:6px 20px;background:linear-gradient(135deg,var(--pink-soft),rgba(176,136,208,.15));border-radius:20px;
+    border:1px solid rgba(240,160,200,.2);
+    animation:gPop 2.5s ease-in-out infinite 1s;
+}
+@keyframes gPop{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+h1{
+    font-family:'ZCOOL KuaiLe',cursive;
+    font-size:4em;margin-bottom:8px;
+    background:linear-gradient(135deg,var(--pink-deep),var(--purple),var(--pink-deep));
+    background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;letter-spacing:6px;
+    animation:fUp .8s .2s both,superBounce 2.2s ease-in-out infinite 1.5s,gradientShift 4s linear infinite;
+    display:inline-block;
+}
+@keyframes superBounce{0%,100%{transform:translateY(0) scale(1)}20%{transform:translateY(-11px) scale(1.03)}40%{transform:translateY(0) scale(.97)}60%{transform:translateY(-6px) scale(1.01)}80%{transform:translateY(0) scale(1)}}
+@keyframes gradientShift{to{background-position:200% center}}
+
+.sub{
+    font-size:1.08em;color:var(--text-light);margin-bottom:24px;letter-spacing:3px;
+    animation:fUp 1s .6s both;
+}
+.spill{
+    display:inline-flex;align-items:center;gap:8px;padding:10px 26px;
+    background:linear-gradient(135deg,rgba(255,255,255,.9),var(--card));
+    border:1.5px solid var(--border);
+    border-radius:30px;font-size:.78em;color:var(--pink-deep);
+    box-shadow:0 3px 16px rgba(240,160,200,.15);
+    transition:.35s cubic-bezier(.68,-.55,.265,1.55);
+    font-family:'ZCOOL XiaoWei',cursive;
+    animation:fUp 1s .8s both;
+}
+.spill:hover{transform:scale(1.05) translateY(-3px);box-shadow:0 6px 24px rgba(240,160,200,.25)}
+.spill-dot{width:8px;height:8px;background:linear-gradient(135deg,var(--green),var(--blue));border-radius:50%;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px rgba(142,212,168,.4)}50%{opacity:.6;box-shadow:0 0 14px rgba(142,212,168,.2)}}
+
+/* ========== 板块标题（升级） ========== */
+.shdr{text-align:center;margin-bottom:38px;position:relative}
+.snum{
+    font-family:'ZCOOL XiaoWei',cursive;font-size:.72em;color:var(--purple);
+    letter-spacing:4px;
+}
+.stitle{
+    font-family:'ZCOOL KuaiLe',cursive;
+    font-size:2.2em;color:#333;margin-top:6px;
+    letter-spacing:4px;
+    position:relative;display:inline-block;
+}
+.stitle span{color:var(--pink-deep)}
+.sline{
+    width:50px;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));
+    margin:14px auto 0;border-radius:2px;
+    background-size:200% auto;
+    animation:sLineMove 3s linear infinite;
+}
+@keyframes sLineMove{to{background-position:200% center}}
+
+/* 小三角升级 */
+.triangle{
+    position:absolute;width:0;height:0;
+    border-left:solid 13px transparent;border-right:solid 13px transparent;border-bottom:solid 20px solid var(--pink);
+    opacity:.35;animation:tBounce 2.5s ease-in-out infinite alternate;
+}
+.t1{top:-8px;left:28%}.t2{top:-8px;right:32%;border-bottom-color:var(--purple);opacity:.28}
+@keyframes tBounce{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+
+/* ========== 文字内容 ========== */
+.txt{max-width:700px;width:100%}
+.txt p{font-size:.96em;line-height:2.05;color:var(--text);margin-bottom:15px;text-indent:2em}
+.hl{color:var(--pink-deep);font-weight:500}.hlp{color:var(--purple);font-weight:500}.hlg{color:var(--green);font-weight:500}
+
+/* ========== 卡片网格（玻璃拟态+流光） ========== */
+.cgrid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;max-width:980px;width:100%;
+}
+.card{
+    background:rgba(255,255,255,.75);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border-radius:22px;
+    padding:28px 24px;position:relative;
+    border:1.5px solid var(--border);
+    box-shadow:
+        0 4px 20px rgba(240,160,200,.12),
+        0 0 0 1px rgba(255,255,255,.5) inset;
+    transition:all .4s cubic-bezier(.22,1,.36,1);
+    overflow:hidden;
+}
+/* 卡片顶部渐变条 + 流光扫过效果 */
+.card::before{
+    content:'';position:absolute;top:0;left:-100%;width:60%;height:3px;
+    background:linear-gradient(90deg,transparent,var(--pink),var(--purple),var(--blue),transparent);
+    transition:left .6s ease;
+}
+.card::after{
+    content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+    border-radius:22px;
+    background:linear-gradient(125deg,transparent 40%, rgba(255,255,255,.3) 45%, transparent 50%);
+    opacity:0;transition:opacity .4s;pointer-events:none;
+}
+.card:hover::before{left:120%}
+.card:hover::after{opacity:1}
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow:
+        0 16px 44px rgba(240,160,200,.25),
+        0 0 30px rgba(240,160,200,.1),
+        0 0 0 1px rgba(240,160,200,.3) inset;
+    border-color:rgba(240,160,200,.45);
+    background:rgba(255,255,255,.88);
+}
+.ci{font-size:2.3em;margin-bottom:12px;display:block;transition:.45s cubic-bezier(.68,-.55,.265,1.55);filter:drop-shadow(0 2px 4px rgba(240,160,200,.15))}
+.card:hover .ci{transform:scale(1.15) rotate(-4deg);filter:drop-shadow(0 4px 8px rgba(240,160,200,.25))}
+.ct{
+    font-family:'ZCOOL KuaiLe',cursive;font-size:1.15em;color:#333;margin-bottom:8px;
+    letter-spacing:2px;transition:.4s cubic-bezier(.68,-.55,.265,1.55)
+}
+.card:hover .ct{transform:scale(1.04);display:inline-block}
+.cb{font-size:.84em;color:var(--text-light);line-height:1.72}
+.ctag{
+    display:inline-block;margin-top:13px;padding:5px 16px;font-size:.7em;
+    background:linear-gradient(135deg,var(--bg2),rgba(176,136,208,.08));border-radius:15px;color:var(--pink-deep);
+    font-family:'ZCOOL XiaoWei',cursive;letter-spacing:.5px;
+    border:1px solid rgba(240,160,200,.2);
+    transition:.4s;
+}
+.ctag:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 3px 12px rgba(240,160,200,.15)}
+
+/* ========== 双栏布局 ========== */
+.twocol{
+    display:grid;grid-template-columns:1fr 1fr;gap:36px;
+    max-width:940px;width:100%;
+}
+
+/* 列表项升级 */
+.lblock{width:100%}
+.li{
+    display:flex;align-items:center;gap:12px;padding:14px 18px;
+    margin-bottom:10px;background:rgba(255,255,255,.7);
+    backdrop-filter:blur(4px);
+    border-radius:18px;border:1.5px solid var(--border);
+    font-size:.86em;color:var(--text);
+    transition:all .35s cubic-bezier(.22,1,.36,1);
+}
+.li:hover{
+    transform:translateX(8px) scale(1.02);border-color:rgba(240,160,200,.45);
+    box-shadow:0 6px 20px rgba(240,160,200,.18);
+    background:rgba(255,255,255,.92);
+}
+.lb{font-size:1.3em;flex-shrink:0;transition:.4s cubic-bezier(.68,-.55,.265,1.55)}
+.li:hover .lb{transform:scale(1.3) rotate(-10deg)}
+.lt strong{color:#333;font-weight:600}
+
+/* ========== 数据面板（升级） ========== */
+.srow{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:18px;
+    max-width:880px;width:100%;
+}
+.sbox{
+    background:rgba(255,255,255,.75);
+    backdrop-filter:blur(8px);
+    border-radius:22px;
+    padding:28px 16px;border:1.5px solid var(--border);
+    transition:all .4s;overflow:hidden;position:relative;
+    box-shadow:0 4px 16px rgba(240,160,200,.1);
+}
+.sbox::after{
+    content:'';position:absolute;bottom:0;left:0;width:0;height:3px;
+    background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));
+    transition:width .5s;
+}
+.sbox:hover::after{width:100%}
+.sbox:hover{
+    transform:translateY(-8px) scale(1.04);
+    box-shadow:0 14px 36px rgba(240,160,200,.22),0 0 24px rgba(240,160,200,.12);
+    background:rgba(255,255,255,.92);
+}
+.sv{
+    font-family:'ZCOOL KuaiLe',cursive;font-size:2.6em;
+    background:linear-gradient(135deg,var(--pink-deep),var(--purple));
+    background-size:auto 200%;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;margin-bottom:6px;transition:.4s;
+    animation:svGradient 4s linear infinite paused;
+}
+.sbox:hover .sv{transform:scale(1.12);display:inline-block;animation-play-state:running}
+@keyframes svGradient{to{background-position:0 200%}}
+.sl{font-family:'ZCOOL XiaoWei',cursive;font-size:.7em;color:var(--text-lighter);letter-spacing:2px}
+
+/* ========== 页脚升级 ========== */
+footer{
+    text-align:center;padding:44px 20px;border-top:1px solid var(--border);
+    font-size:.78em;color:var(--text-lighter);
+    letter-spacing:2px;background:linear-gradient(180deg,var(--bg2),var(--bg));
+    position:relative;
+}
+footer em{color:var(--pink-deep);font-style:normal}
+.footer-dots{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.footer-dots span{display:inline-block;width:7px;height:7px;border-radius:50%;transition:.3s;}
+.footer-dots span:hover{transform:scale(1.5)}
+.fd1{background:var(--pink)}.fd2{background:var(--purple)}.fd3{background:var(--blue)}.fd4{background:var(--green)}.fd5{background:var(--orange)}
+
+/* ========== 音乐播放器 ========== */
+.music-player{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:11px;
+    background:linear-gradient(135deg,rgba(255,255,255,.95),#fff5f8);
+    border:2px solid var(--pink-soft);border-radius:50px;
+    padding:9px 16px 9px 9px;
+    z-index:9999;
+    box-shadow:
+        0 6px 28px rgba(240,160,200,.3),
+        0 0 40px rgba(240,160,200,.1);
+    animation:mpUp .8s cubic-bezier(.22,1,.36,1) both;
+    min-width:280px;
+}
+@keyframes mpUp{from{opacity:0;transform:translateX(-50%) translateY(30px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.mp-avatar{
+    width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;
+    border:2px solid var(--pink);box-shadow:0 2px 10px rgba(240,160,200,.25);
+}
+.mp-avatar img{width:100%;height:100%;object-fit:cover}
+.mp-play-btn{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+    border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;transition:.35s;box-shadow:0 3px 12px rgba(224,128,176,.4);
+}
+.mp-play-btn:hover{transform:scale(1.1);box-shadow:0 5px 20px rgba(224,128,176,.5)}
+.mp-play-btn svg{width:13px;height:13px;fill:#fff;margin-left:2px}
+.mp-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.mp-progress-wrap{
+    width:100%;height:5px;background:var(--pink-soft);border-radius:3px;
+    cursor:pointer;position:relative;overflow:hidden;
+}
+.mp-progress-bar{
+    height:100%;background:linear-gradient(90deg,var(--pink),var(--purple));
+    border-radius:3px;width:0%;transition:width .15s linear;
+}
+.mp-time{font-size:.64em;color:var(--text-lighter);display:flex;justify-content:space-between;letter-spacing:.5px}
+.mp-toggle{
+    width:26px;height:26px;border-radius:50%;background:var(--card);
+    border:1.5px solid var(--border);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;transition:.3s;color:var(--pink);font-size:.72em;font-weight:700;
+}
+.mp-toggle:hover{background:var(--bg2);color:var(--pink-deep)}
+
+/* 滚动条 */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--pink-soft);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--pink)}
+
+/* 响应式 */
+@media(max-width:900px){
+    section{padding:90px 24px 55px}
+    h1{font-size:2.6em}
+    .nav-links{display:none}
+    .srow{grid-template-columns:repeat(2,1fr)}
+    .twocol{grid-template-columns:1fr}
+    .quote-text{font-size:1.5em}
+    .stitle{font-size:1.5em}
+    .music-player{max-width:calc(100vw - 36px)}
+    .cgrid{grid-template-columns:1fr 1fr;}
+    .cursor-glow{display:none}
+}
+@media(max-width:600px){
+    .cgrid{grid-template-columns:1fr}
+    .srow{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- 视频背景 -->
+<video class="bg-video" autoplay loop muted playsinline preload="auto">
+    <source src="bg_video.mp4" type="video/mp4">
+</video>
+<div class="bg-overlay"></div>
+
+<!-- 鼠标光晕 -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- 浮动气泡（JS动态生成位置） -->
+
+<!-- 星星装饰 -->
+<div class="sparkle s1"></div><div class="sparkle s2"></div>
+<div class="sparkle s3"></div><div class="sparkle s4"></div><div class="sparkle s5"></div><div class="sparkle s6"></div>
+
+<nav>
+    <div class="logo">✿ 王梓桐</div>
+    <ul class="nav-links">
+        <li><a href="#quote">HOME</a></li>
+        <li><a href="#about">ABOUT</a></li>
+        <li><a href="#code">CODE</a></li>
+        <li><a href="#mc">MINECRAFT</a></li>
+        <li><a href="#life">LIFE</a></li>
+        <li><a href="#data">DATA</a></li>
+    </ul>
+</nav>
+
+<main>
+
+<!-- 第一屏：随机名言 -->
+<section class="hero-quote" id="quote">
+    <div class="quote-line"></div>
+    <blockquote class="quote-text" id="quoteText"></blockquote>
+    <div class="quote-src" id="quoteSrc"></div>
+    <div class="scroll-hint">
+        <span>向 下 滚 动</span>
+        <div class="scroll-arrow"></div>
+    </div>
+</section>
+
+<!-- 第二屏：HOME头像 -->
+<section class="hero" id="home">
+    <div class="hwrap">
+        <div class="av-card">
+            <div class="av-glow-ring"></div>
+            <div class="av-ring"></div>
+            <img src="avatar.jpg" alt="王梓桐">
+        </div>
+        <p class="greet">✦ 你好呀 ✦</p>
+        <h1>王梓桐</h1>
+        <p class="sub">七年级 → 八年级 · 编程 &amp; 数学 &amp; MC</p>
+        <div class="spill"><span class="spill-dot"></span> 正在升级中...</div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+    <div class="shdr">
+        <div class="triangle t1"></div>
+        <div class="triangle t2"></div>
+        <div class="snum">ABOUT ME</div>
+        <div class="sttitle">关于<span>我</span></div>
+        <div class="sline"></div>
+    </div>
+    <div class="txt">
+        <p>我是<span class="hl">王梓桐</span>，马上八年级的学生。比起刷短视频，我更喜欢对着电脑屏幕折腾东西。</p>
+        <p>小学第一次接触编程，当时觉得能在黑窗口输入几行字电脑就照做——这件事本身就很神奇。<span class="hlp">数学</span>也一样，不是天赋型选手，但就是享受卡住然后突然想通的过程。</p>
+        <p>目前的我就是一个<span class="hlg">在学东西的路上的人</span>。没什么宏大成就可以展示，方向还算清楚。</p>
+    </div>
+</section>
+
+<!-- CODE -->
+<section id="code" style="background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,var(--bg2) 40%,rgba(255,255,255,.5) 100%);">
+    <div class="shdr">
+        <div class="snum">CODING</div>
+        <div class="sttitle">💻 编 程</div>
+        <div class="sline"></div>
+    </div>
+    <div class="twocol">
+        <div class="txt">
+            <p>水平大概入门到中级。<span class="hl">HTML/CSS/JS</span>接触最多；<span class="hl">Python</span>写小脚本。算法刚开始学。</p>
+            <div class="lblock" style="margin-top:22px;">
+                <div class="li"><span class="lb">🐛</span><span class="lt"><strong>最怕：</strong>debug两小时发现少了个分号</span></div>
+                <div class="li"><span class="lb">❤️</span><span class="lt"><strong>为什么喜欢：</strong>"我让它做，它真的做了"</span></div>
+                <div class="li"><span class="lb">🎯</span><span class="lt"><strong>想学：</strong>C++为竞赛 / Unity做游戏</span></div>
+            </div>
+        </div>
+        <div class="txt">
+            <p>一行行文字变成实际功能很爽。哪怕再小的功能，自己从头写出来也挺有成就感。</p>
+            <p>代码跑起来跟想的完全不一样这种事频率不低。每次解决完又会觉得还行，继续写下一段。</p>
+        </div>
+    </div>
+</section>
+
+<!-- MINECRAFT -->
+<section id="mc">
+    <div class="shdr">
+        <div class="triangle t1"></div><div class="triangle t2"></div>
+        <div class="snum">MINECRAFT</div>
+        <div class="sttitle">⛏️ 我的方块世界</div>
+        <div class="sline"></div>
+    </div>
+    <div class="cgrid">
+        <div class="card">
+            <span class="ci">🏕️</span>
+            <div class="ct">生存模式</div>
+            <div class="cb">从不知道怎么合成镐子到闭眼知道每种矿在哪层。最喜欢前期资源匮乏时每样东西都很珍贵的感觉。</div>
+            <span class="ctag">HARD CORE FAN</span>
+        </div>
+        <div class="card">
+            <span class="ci">⚡</span>
+            <div class="ct">红石电路</div>
+            <div class="cb">MC里最有意思的部分。自动农场、隐藏门、简单计算器都试过。自己搞的逻辑门能工作就开心。</div>
+            <span class="ctag">LOGIC GATES</span>
+        </div>
+        <div class="card">
+            <span class="ci">🏗️</span>
+            <div class="ct">建筑</div>
+            <div class="cb">建筑水平属于"能看出是个房子"。喜欢挖平一块地往上堆方块的过程。最近在跟教程学。</div>
+            <span class="ctag">PRACTICING...</span>
+        </div>
+        <div class="card">
+            <span class="ci">🎮</span>
+            <div class="ct">联机</div>
+            <div class="cb">偶尔联机。一起建比自己一个人有意思得多——虽然经常出现"你为什么把墙拆了"的对话。</div>
+            <span class="ctag">COOP MODE</span>
+        </div>
+    </div>
+</section>
+
+<!-- LIFE -->
+<section id="life" style="background:linear-gradient(180deg,rgba(255,255,255,.4) 0%,var(--bg2) 100%);">
+    <div class="shdr">
+        <div class="snum">OFFLINE LIFE</div>
+        <div class="sttitle">🌟 生活碎片</div>
+        <div class="sline"></div>
+    </div>
+    <div class="cgrid">
+        <div class="card">
+            <span class="ci">🎵</span>
+            <div class="ct">音乐</div>
+            <div class="cb">编程时必须放歌，什么风格看心情。写代码偏好纯音乐或电子。几百首歌循环播放也不会腻。</div>
+            <span class="ctag">POP / ELECTRONIC</span>
+        </div>
+        <div class="card">
+            <span class="ci">📺</span>
+            <div class="ct">动漫</div>
+            <div class="cb">追番不算多但每部都认真回味。喜欢世界观完整的作品，好故事结构本身值得学习。</div>
+            <span class="ctag">2D WORLD</span>
+        </div>
+        <div class="card">
+            <span class="ci">🎮</span>
+            <div class="ct">游戏</div>
+            <div class="cb">除MC外也玩别的。独立游戏居多，很多独立开发者的想法很有创意。</div>
+            <span class="ctag">EXPLORING</span>
+        </div>
+        <div class="card">
+            <span class="ci">📐</span>
+            <div class="ct">数学</div>
+            <div class="cb">不只学科。会主动找有趣的课外题来做，不是刷题那种。竞赛还在准备中。</div>
+            <span class="ctag">PROBLEM SOLVING</span>
+        </div>
+    </div>
+</section>
+
+<!-- DATA -->
+<section id="data">
+    <div class="shdr">
+        <div class="snum">QUICK STATS</div>
+        <div class="sttitle">📊 数据面板</div>
+        <div class="sline"></div>
+    </div>
+    <div class="srow">
+        <div class="sbox"><div class="sv">~14</div><div class="sl">年龄</div></div>
+        <div class="sbox"><div class="sv">G8</div><div class="sl">即将升入</div></div>
+        <div class="sbox"><div class="sv">3+</div><div class="sl">编码年限</div></div>
+        <div class="sbox"><div class="sv">∞</div><div class="sl">待办事项</div></div>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <p>Made with ❤ by 王梓桐 · 2025 · STILL LEARNING <em>&amp;</em> BUILDING</p>
+    <div class="footer-dots">
+        <span class="fd1"></span><span class="fd2"></span><span class="fd3"></span><span class="fd4"></span><span class="fd5"></span>
+    </div>
+</footer>
+
+<!-- 音乐播放器 -->
+<div class="music-player" id="musicPlayer">
+    <div class="mp-avatar"><img src="avatar.jpg" alt=""></div>
+    <button class="mp-play-btn" id="mpPlayBtn" title="播放/暂停">
+        <svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>
+    </button>
+    <div class="mp-info">
+        <div class="mp-progress-wrap" id="mpProgressWrap">
+            <div class="mp-progress-bar" id="mpProgressBar"></div>
+        </div>
+        <div class="mp-time"><span id="mpCurTime">0:00</span><span id="mpDurTime">0:00</span></div>
+    </div>
+    <button class="mp-toggle" id="mpToggle" title="收起/展开">^</button>
+</div>
+
+<audio id="bgmAudio" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg"></audio>
+
+<script>
+// ====== 1. 浮动气泡生成 ======
+(function(){
+    const colors = ['var(--pink)','var(--purple)','var(--blue)','var(--green)','var(--orange)','var(--pink-deep)'];
+    for(let i=0;i<12;i++){
+        const b=document.createElement('div');
+        b.className='bubble';
+        const size=Math.random()*14+4;
+        b.style.width=size+'px';
+        b.style.height=size+'px';
+        b.style.left=Math.random()*100+'%';
+        b.style.bottom='-20px';
+        b.style.background=colors[Math.floor(Math.random()*colors.length)];
+        b.style.animationDuration=(Math.random()*12+8)+'s';
+        b.style.animationDelay=(Math.random()*10)+'s';
+        document.body.appendChild(b);
+    }
+})();
+
+// ====== 2. 鼠标跟随光晕 ======
+(function(){
+    const glow=document.getElementById('cursorGlow');
+    let tx=0,ty=0,cx=0,cy=0;
+    document.addEventListener('mousemove',function(e){
+        tx=e.clientX;ty=e.clientY;
+    });
+    function animate(){cx+=(tx-cx)*0.12;cy+=(ty-cy)*0.12;glow.style.transform='translate('+cx+'px,'+cy+'px) translate(-50%,-50%)';requestAnimationFrame(animate);}
+    animate();
+})();
+
+// ====== 3. 名言打字机效果 ======
+(function(){
+    const q = [
+        {t:'雨纷纷，旧故里草木深<br>我听闻，你始终<em>一个人</em>',s:'— 方文山 · 青花瓷'},
+        {t:'一路向北<br>离开有你的<em>季节</em>',s:'— 周杰伦 · 一路向北'},
+        {t:'生活就像一首歌<br>有快乐也有悲伤<br>但音乐让我学会<em>享受每一刻</em>',s:'— 互联网'}
+    ];
+    const p = q[Math.floor(Math.random()*q.length)];
+    const el = document.getElementById('quoteText');
+    const srcEl = document.getElementById('quoteSrc');
+
+    // 先把HTML写入一个隐藏的临时元素获取纯文本长度
+    el.innerHTML=p.t;
+
+    // 打字机效果：逐字显示
+    el.innerHTML='';
+    let htmlIndex=0;
+    // 把带标签的文本拆分成片段
+    const raw=p.t;
+    const fragments=[];
+    let i=0;
+    while(i<raw.length){
+        if(raw[i]==='<'){
+            const end=raw.indexOf('>',i);
+            fragments.push({type:'tag',text:raw.slice(i,end+1)});
+            i=end+1;
+        }else{
+            if(!fragments.length||fragments[fragments.length-1].type!=='text')
+                fragments.push({type:'text',text:''});
+            fragments[fragments.length-1].text+=raw[i];
+            i++;
+        }
+    }
+
+    let fi=0,ci=0;
+    function step(){
+        if(fi>=fragments.length){srcEl.textContent=p.s;return;}
+        const frag=fragments[fi];
+        if(frag.type==='tag'){
+            el.innerHTML+=frag.text;
+            fi++;ci=0;
+        }else{
+            el.innerHTML+=frag.text[ci];
+            ci++;
+            if(ci>=frag.text.length){fi++;ci=0;}
+        }
+        setTimeout(step,fi===0?200:50+Math.random()*50);
+    }
+    setTimeout(step,800);
+
+    setTimeout(function(){srcEl.textContent=p.s;srcEl.style.opacity='1'},2500);
+})();
+
+// ====== 4. 平滑滚动 ======
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',function(e){e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});
+    });
+});
+
+// ====== 5. 卡片鼠标跟随3D ======
+document.querySelectorAll('.card').forEach(c=>{
+    c.addEventListener('mousemove',function(e){
+        const r=c.getBoundingClientRect();
+        const x=(e.clientX-r.left)/r.width-.5;
+        const y=(e.clientY-r.top)/r.height-.5;
+        c.style.transform=`translateY(-8px) perspective(500px) rotateY(${x*7}deg) rotateX(${-y*7}deg)`;
+    });
+    c.addEventListener('mouseleave',function(){c.style.transform='translateY(-8px)';});
+});
+
+// ====== 6. 导航链接hover波纹 ======
+document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.addEventListener('mouseenter',function(){
+        this.style.background='linear-gradient(90deg,transparent,rgba(240,160,200,.1),transparent)';
+        this.style.backgroundSize='200% 100%';
+        this.style.transition='background .5s';
+        this.style.backgroundPosition='-100% 0';
+        setTimeout(()=>{this.style.backgroundPosition='200% 0';},10);
+    });
+});
+
+// ====== 7. 音乐播放器 ======
+(function(){
+    const a=document.getElementById('bgmAudio');
+    const b=document.getElementById('mpPlayBtn');
+    const pw=document.getElementById('mpProgressWrap');
+    const pb=document.getElementById('mpProgressBar');
+    const ct=document.getElementById('mpCurTime');
+    const dt=document.getElementById('mpDurTime');
+    const tg=document.getElementById('mpToggle');
+    const pl=document.getElementById('musicPlayer');
+    let playing=false;
+    b.addEventListener('click',()=>{
+        if(playing){a.pause();b.innerHTML='<svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>';}
+        else{a.play();b.innerHTML='<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';}
+        playing=!playing;
+    });
+    function fm(s){const m=Math.floor(s/60);const n=Math.floor(s%60);return m+':'+(n<10?'0':'')+n}
+    a.addEventListener('timeupdate',()=>{if(a.duration){pb.style.width=a.currentTime/a.duration*100+'%';ct.textContent=fm(a.currentTime)}});
+    a.addEventListener('loadedmetadata',()=>{dt.textContent=fm(a.duration)});
+    pw.addEventListener('click',e=>{if(a.duration){const r=pw.getBoundingClientRect();a.currentTime=((e.clientX-r.left)/r.width)*a.duration}});
+    let ex=true;
+    tg.addEventListener('click',()=>{ex=!ex;if(ex){pl.style.minWidth='280px';document.querySelector('.mp-info').style.display='flex';tg.textContent='^'}else{pl.style.minWidth='auto';document.querySelector('.mp-info').style.display='none';tg.textContent='v'}});
+})();
+</script>
+</body>
+</html>

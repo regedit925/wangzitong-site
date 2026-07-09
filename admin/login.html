@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - 王梓桐后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --pink: #f0a0c8;
+            --pink-deep: #e06090;
+            --purple: #b088d0;
+            --bg: #fff8fb;
+            --card: #ffffff;
+            --text: #333;
+            --text-light: #888;
+            --border: rgba(240,160,200,.2);
+            --shadow: 0 10px 40px rgba(240,160,200,.15);
+        }
+        
+        body {
+            font-family: 'ZCOOL KuaiLe', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #fff5f9 0%, #fef0f7 50%, #f5f0ff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 背景装饰 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(240,160,200,.15) 0%, transparent 70%);
+            top: -100px; right: -100px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(176,136,208,.12) 0%, transparent 70%);
+            bottom: -50px; left: -50px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .login-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 420px;
+            max-width: 92vw;
+            box-shadow: var(--shadow);
+            border: 1.5px solid var(--border);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: cardIn 0.6s ease-out;
+        }
+        
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            display: block;
+            animation: bounceIn 0.8s ease-out 0.2s both;
+        }
+        
+        @keyframes bounceIn {
+            from { opacity: 0; transform: scale(0); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 2em;
+            color: var(--pink-deep);
+            margin-bottom: 8px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 0.95em;
+            color: var(--text-light);
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.88em;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            font-size: 1em;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--pink-deep);
+            box-shadow: 0 0 0 4px rgba(224,96,144,.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--pink-deep), var(--purple));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1em;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(224,96,144,.35);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-msg {
+            background: #fff0f3;
+            border: 1px solid rgba(224,96,144,.25);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.88em;
+            color: var(--pink-deep);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer-text {
+            margin-top: 28px;
+            font-size: 0.82em;
+            color: var(--text-light);
+        }
+        
+        a {
+            color: var(--pink-deep);
+            text-decoration: none;
+        }
+
+        a:hover { text-decoration: underline; }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .login-card { padding: 36px 26px; }
+            h1 { font-size: 1.7em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <span class="logo-icon">🔐</span>
+        <h1>后台管理</h1>
+        <p class="subtitle">王梓桐个人主页 · 管理员登录</p>
+
+        <div id="errorMsg" class="error-msg"></div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="username" name="username" 
+                       placeholder="请输入用户名" autocomplete="username"
+                       required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="password" name="password" 
+                       placeholder="请输入密码" autocomplete="current-password"
+                       required>
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn-login">
+                登 录
+            </button>
+        </form>
+
+        <p class="footer-text">
+            <a href="/">← 返回前台首页</a>
+        </p>
+    </div>
+
+    <script>
+        // 检查是否已登录
+        const token = localStorage.getItem('admin_token');
+        if (token) {
+            window.location.href = '/admin/dashboard.html';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('errorMsg');
+            const btn = document.getElementById('loginBtn');
+
+            if (!username || !password) {
+                showError('请填写用户名和密码');
+                return;
+            }
+
+            // 显示loading状态
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> 登录中...';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (data.success && data.token) {
+                    // 存储token
+                    localStorage.setItem('admin_token', data.token);
+                    localStorage.setItem('admin_user', JSON.stringify(data.user));
+
+                    // 跳转到控制面板
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    showError(data.error || '登录失败');
+                }
+            } catch (err) {
+                showError('网络错误，请检查服务器连接');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '登 录';
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.classList.add('show');
+
+            // 3秒后自动隐藏
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

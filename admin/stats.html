@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问统计 - 王梓桐后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f0a0c8; --pink-deep: #e06090; --purple: #b088d0;
+            --bg: #fff8fb; --card: #ffffff;
+            --text: #333; --text-light: #888;
+            --border: rgba(240,160,200,.18);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { font-family: 'ZCOOL KuaiLe', -apple-system, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 240px; min-height: 100vh;
+            background: linear-gradient(180deg, #fff5f9, #fef5fa);
+            border-right: 1.5px solid var(--border);
+            padding: 24px 16px; position: fixed; left: 0; top: 0;
+            z-index: 100; display: flex; flex-direction: column;
+        }
+
+        .logo { text-align: center; padding-bottom: 20px; border-bottom: 1.5px solid var(--border); margin-bottom: 20px; }
+        .logo-icon { font-size: 2em; }
+        .logo-text { font-size: 1em; color: var(--pink-deep); margin-top: 6px; letter-spacing: 2px; }
+
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item a {
+            display: flex; align-items: center; gap: 10px; padding: 13px 16px;
+            border-radius: 12px; color: var(--text-light); text-decoration: none;
+            font-size: 0.95em; transition: all 0.25s ease; margin-bottom: 4px;
+        }
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(240,160,200,.15), rgba(176,136,208,.1));
+            color: var(--pink-deep); transform: translateX(4px);
+        }
+        .nav-item .emoji { font-size: 1.3em; width: 26px; text-align: center; }
+
+        .user-info { padding-top: 16px; border-top: 1.5px solid var(--border); font-size: 0.85em; }
+        .user-name { color: var(--pink-deep); font-weight: bold; margin-bottom: 6px; }
+        .logout-btn { background: none; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 14px; cursor: pointer; font-family: inherit; font-size: 0.85em; color: var(--text-light); transition: all 0.25s ease; width: 100%; }
+        .logout-btn:hover { background: rgba(224,96,144,.08); color: var(--pink-deep); border-color: var(--pink); }
+
+        .main-content { flex: 1; margin-left: 240px; padding: 28px 36px; }
+        h2 { font-size: 2em; background: linear-gradient(135deg, var(--pink-deep), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; margin-bottom: 28px; }
+
+        /* 统计卡片 */
+        .stats-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 28px; }
+
+        .stat-box {
+            background: var(--card); border-radius: 16px; padding: 22px;
+            border: 1.5px solid var(--border); text-align: center;
+        }
+        
+        .stat-num { font-size: 2.6em; font-weight: bold; background: linear-gradient(135deg, var(--pink-deep), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { font-size: 0.88em; color: var(--text-light); margin-top: 4px; }
+
+        /* 图表区域 */
+        .chart-section {
+            background: var(--card); border-radius: 16px; padding: 24px;
+            border: 1.5px solid var(--border); margin-bottom: 20px;
+        }
+
+        .section-title { font-size: 1.15em; color: var(--pink-deep); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+
+        /* 简单柱状图 */
+        .bar-chart { height: 200px; display: flex; align-items: flex-end; gap: 6px; overflow-x: auto; padding-bottom: 10px; }
+        
+        .bar-col { flex: 1; min-width: 28px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .bar-fill { width: 100%; min-width: 12px; max-width: 40px; background: linear-gradient(180deg, var(--pink-deep), var(--purple)); border-radius: 6px 6px 2px 2px; transition: height 0.5s ease; position: relative; }
+        .bar-value { font-size: 0.72em; color: var(--text-light); white-space: nowrap; }
+        .bar-date { font-size: 0.68em; color: var(--text-light); opacity: 0.7; writing-mode: vertical-lr; letter-spacing: 2px; }
+
+        /* 热门页面 */
+        .top-pages-list { list-style: none; }
+        
+        .top-page-row {
+            display: flex; align-items: center; gap: 14px; padding: 11px 0;
+            border-bottom: 1px solid rgba(240,160,200,.06);
+        }
+
+        .rank-badge {
+            width: 26px; height: 26px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.82em; font-weight: bold;
+            background: var(--bg); color: var(--text-light);
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb800) !important; color: white !important; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0) !important; color: white !important; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #b07030) !important; color: white !important; }
+
+        .page-path { flex: 1; font-family: monospace; font-size: 0.9em; color: var(--text); word-break: break-all; }
+        
+        .page-visits { font-size: 1.05em; font-weight: bold; color: var(--pink-deep); white-space: nowrap; }
+        
+        .page-bar-bg { flex: none; width: 60px; height: 8px; background: rgba(240,160,200,.15); border-radius: 4px; overflow: hidden; }
+        .page-bar-fill { height: 100%; background: linear-gradient(90deg, var(--pink-deep), var(--purple)); border-radius: 4px; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; } .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo"><div class="logo-icon">🌸</div><div class="logo-text">管理后台</div></div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/admin/dashboard.html"><span class="emoji">📊</span> 控制面板</a></li>
+            <li class="nav-item"><a href="/admin/profile.html"><span class="emoji">✏️</span> 编辑简介</a></li>
+            <li class="nav-item"><a href="/admin/quotes.html"><span class="emoji">💬</span> 名言管理</a></li>
+            <li class="nav-item"><a href="/admin/media.html"><span class="emoji">🖼️</span> 媒体文件</a></li>
+            <li class="nav-item"><a href="/admin/stats.html" class="active"><span class="emoji">📈</span> 访问统计</a></li>
+        </ul>
+        <div class="user-info">
+            <div class="user-name" id="displayName">管理员</div>
+            <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <h2>📈 访问统计</h2>
+
+        <!-- 概览卡片 -->
+        <div class="stats-overview">
+            <div class="stat-box">
+                <div class="stat-num" id="todayCount">--</div>
+                <div class="stat-label">今日访问</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="totalCount">--</div>
+                <div class="stat-label">近30天总访问</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="avgCount">--</div>
+                <div class="stat-label">日均访问</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="peakDay">--</div>
+                <div class="stat-label">峰值日</div>
+            </div>
+        </div>
+
+        <!-- 访问趋势图 -->
+        <div class="chart-section">
+            <h3 class="section-title">📊 近14天访问趋势</h3>
+            <div class="bar-chart" id="barChart">
+                <p style="width:100%;text-align:center;color:var(--text-light)">加载中...</p>
+            </div>
+        </div>
+
+        <!-- 热门页面 -->
+        <div class="chart-section">
+            <h3 class="section-title">🔥 热门页面 TOP 10</h3>
+            <ul class="top-pages-list" id="topPagesList">
+                <li style="padding:30px;text-align:center;color:var(--text-light)">加载中...</li>
+            </ul>
+        </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            loadStats();
+        });
+
+        async function loadStats() {
+            try {
+                const data = await apiGet('/api/stats/visits?days=30');
+
+                // 填充概览
+                document.getElementById('todayCount').textContent = data.todayVisits || 0;
+                document.getElementById('totalCount').textContent = data.totalVisits || 0;
+
+                const days = Math.min(30, data.dailyStats?.length || 1);
+                const avg = Math.round((data.totalVisits || 0) / days);
+                document.getElementById('avgCount').textContent = avg;
+
+                // 找出峰值日
+                if (data.dailyStats?.length) {
+                    const peak = data.dailyStats.reduce((a, b) => a.visits > b.visits ? a : b);
+                    document.getElementById('peakCount').textContent = peak.visits;
+                    document.getElementById('peakDay').parentElement.querySelector('.stat-label').textContent =
+                        `峰值日 (${peak.date.slice(5)})`;
+                }
+
+                // 渲染柱状图（最近14天）
+                renderBarChart(data.dailyStats?.slice(-14).reverse() || []);
+
+                // 渲染热门页面
+                renderTopPages(data.topPages || []);
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderBarChart(dailyData) {
+            const container = document.getElementById('barChart');
+            
+            if (!dailyData.length) {
+                container.innerHTML = '<p style="width:100%;text-align:center;color:var(--text-light)">暂无数据</p>';
+                return;
+            }
+
+            const maxVisits = Math.max(...dailyData.map(d => d.visits), 1);
+
+            container.innerHTML = dailyData.map((d, i) => `
+                <div class="bar-col">
+                    <div class="bar-value">${d.visits}</div>
+                    <div class="bar-fill" style="height:${Math.max(8, (d.visits / maxVisits) * 160)}px"></div>
+                    <div class="bar-date">${d.date.slice(5)}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderTopPages(topPages) {
+            const container = document.getElementById('topPagesList');
+
+            if (!topPages.length) {
+                container.innerHTML = '<li style="padding:30px;text-align:center;color:var(--text-light)">暂无数据</li>';
+                return;
+            }
+
+            const maxVisits = Math.max(...topPages.map(p => p.visits), 1);
+
+            container.innerHTML = topPages.map((p, i) => `
+                <li class="top-page-row">
+                    <span class="rank-badge rank-${i + 1}">${i + 1}</span>
+                    <span class="page-path">${escapeHtml(p.path)}</span>
+                    <div class="page-bar-bg"><div class="page-bar-fill" style="width:${(p.visits / maxVisits) * 100}%"></div></div>
+                    <span class="page-visits">${p.visits}次</span>
+                </li>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

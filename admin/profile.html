@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑简介 - 王梓桐后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f0a0c8; --pink-deep: #e06090; --purple: #b088d0;
+            --bg: #fff8fb; --card: #ffffff;
+            --text: #333; --text-light: #888;
+            --border: rgba(240,160,200,.18);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'ZCOOL KuaiLe', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏（复用dashboard的样式） */
+        .sidebar {
+            width: 240px; min-height: 100vh;
+            background: linear-gradient(180deg, #fff5f9, #fef5fa);
+            border-right: 1.5px solid var(--border);
+            padding: 24px 16px;
+            position: fixed; left: 0; top: 0; z-index: 100;
+            display: flex; flex-direction: column;
+        }
+
+        .logo { text-align: center; padding-bottom: 20px; border-bottom: 1.5px solid var(--border); margin-bottom: 20px; }
+        .logo-icon { font-size: 2em; }
+        .logo-text { font-size: 1em; color: var(--pink-deep); margin-top: 6px; letter-spacing: 2px; }
+
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 16px; border-radius: 12px;
+            color: var(--text-light); text-decoration: none;
+            font-size: 0.95em; transition: all 0.25s ease; margin-bottom: 4px;
+        }
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(240,160,200,.15), rgba(176,136,208,.1));
+            color: var(--pink-deep); transform: translateX(4px);
+        }
+        .nav-item .emoji { font-size: 1.3em; width: 26px; text-align: center; }
+
+        .user-info { padding-top: 16px; border-top: 1.5px solid var(--border); font-size: 0.85em; }
+        .user-name { color: var(--pink-deep); font-weight: bold; margin-bottom: 6px; }
+        .logout-btn {
+            background: none; border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 8px 14px;
+            cursor: pointer; font-family: inherit;
+            font-size: 0.85em; color: var(--text-light);
+            transition: all 0.25s ease; width: 100%;
+        }
+        .logout-btn:hover { background: rgba(224,96,144,.08); color: var(--pink-deep); border-color: var(--pink); }
+
+        .main-content { flex: 1; margin-left: 240px; padding: 28px 36px; max-width: 900px; }
+
+        h2 {
+            font-size: 2em;
+            background: linear-gradient(135deg, var(--pink-deep), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 2px; margin-bottom: 28px;
+        }
+
+        .form-card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 28px;
+            border: 1.5px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.15em;
+            color: var(--pink-deep);
+            margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 1.5px dashed var(--border);
+        }
+
+        .field-group { margin-bottom: 22px; }
+
+        label {
+            display: block; font-size: 0.92em;
+            color: var(--text); margin-bottom: 8px;
+            font-weight: normal;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1em; font-family: inherit;
+            background: var(--bg); color: var(--text);
+            outline: none; transition: all 0.25s ease;
+            resize: vertical;
+        }
+
+        textarea { min-height: 120px; line-height: 1.7; }
+
+        input:focus, textarea:focus {
+            border-color: var(--pink-deep);
+            box-shadow: 0 0 0 4px rgba(224,96,144,.08);
+        }
+
+        input.short-input { max-width: 300px; }
+
+        .hint {
+            font-size: 0.82em; color: var(--text-light);
+            margin-top: 6px;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--pink-deep), var(--purple));
+            color: white; border: none;
+            border-radius: 12px;
+            padding: 14px 36px;
+            font-size: 1em; font-family: inherit;
+            cursor: pointer; letter-spacing: 3px;
+            transition: all 0.25s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(224,96,144,.3);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.6; cursor: not-allowed; transform: none;
+        }
+
+        .save-status {
+            display: inline-block; margin-left: 14px;
+            font-size: 0.9em; opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-status.show { opacity: 1; }
+
+        .save-status.success { color: #5cb85c; }
+        .save-status.error { color: var(--pink-deep); }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+
+        /* Toast样式 */
+        .toast-msg {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: white; padding: 12px 24px;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.12);
+            border: 1.5px solid var(--border);
+            z-index: 9999; opacity: 0; transition: all 0.3s cubic-bezier(.68,-.55,.265,1.55);
+            display: flex; align-items: center; gap: 8px; font-size: 0.92em;
+        }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast-success { border-color: #a0d890; }
+        .toast-error { border-color: var(--pink-deep); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo"><div class="logo-icon">🌸</div><div class="logo-text">管理后台</div></div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/admin/dashboard.html"><span class="emoji">📊</span> 控制面板</a></li>
+            <li class="nav-item"><a href="/admin/profile.html" class="active"><span class="emoji">✏️</span> 编辑简介</a></li>
+            <li class="nav-item"><a href="/admin/quotes.html"><span class="emoji">💬</span> 名言管理</a></li>
+            <li class="nav-item"><a href="/admin/media.html"><span class="emoji">🖼️</span> 媒体文件</a></li>
+            <li class="nav-item"><a href="/admin/stats.html"><span class="emoji">📈</span> 访问统计</a></li>
+        </ul>
+        <div class="user-info">
+            <div class="user-name" id="displayName">管理员</div>
+            <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <h2>✏️ 编辑个人简介</h2>
+
+        <!-- 基本信息 -->
+        <div class="form-card">
+            <h3 class="section-title">📝 基本信息</h3>
+
+            <div class="field-group">
+                <label>网站标题 / 名字</label>
+                <input type="text" id="site_name" placeholder="网站显示的名称" class="short-input">
+                <p class="hint">显示在浏览器标签和页面头部</p>
+            </div>
+
+            <div class="field-group">
+                <label>显示名字</label>
+                <input type="text" id="name" placeholder="你的名字">
+            </div>
+
+            <div class="field-group">
+                <label>状态语</label>
+                <input type="text" id="status" placeholder="例如：准八年级 · 未来程序员" class="short-input">
+                <p class="hint">显示在名字下方的一句话</p>
+            </div>
+
+            <div class="field-group">
+                <label>问候语</label>
+                <input type="text" id="greeting" placeholder="你好呀" class="short-input">
+                <p class="hint">HOME区域的标签文字</p>
+            </div>
+        </div>
+
+        <!-- 关于我 -->
+        <div class="form-card">
+            <h3 class="section-title">👤 关于我（简介文字）</h3>
+
+            <div class="field-group">
+                <label>About区域 - 自我介绍正文</label>
+                <textarea id="about_me" placeholder="写一段关于自己的介绍..."></textarea>
+                <p class="hint">支持HTML标签，如&lt;em&gt;&lt;/em&gt;用于高亮文字</p>
+            </div>
+        </div>
+
+        <!-- 保存按钮 -->
+        <button class="btn-save" id="saveBtn" onclick="handleSave()">保存修改</button>
+        <span class="save-status" id="saveStatus"></span>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            loadConfig();
+        });
+
+        // 加载当前配置
+        async function loadConfig() {
+            try {
+                const config = await apiGet('/config');
+                
+                document.getElementById('site_name').value = config.site_name || '';
+                document.getElementById('name').value = config.name || '';
+                document.getElementById('status').value = config.status || '';
+                document.getElementById('greeting').value = config.greeting || '';
+                document.getElementById('about_me').value = config.about_me || '';
+
+            } catch (e) {
+                console.error('加载配置失败:', e);
+                showToast('加载配置失败');
+            }
+        }
+
+        // 保存
+        async function handleSave() {
+            const btn = document.getElementById('saveBtn');
+            const statusEl = document.getElementById('saveStatus');
+
+            const data = {
+                site_name: document.getElementById('site_name').value.trim(),
+                name: document.getElementById('name').value.trim(),
+                status: document.getElementById('status').value.trim(),
+                greeting: document.getElementById('greeting').value.trim(),
+                about_me: document.getElementById('about_me').value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = '保存中...';
+
+            try {
+                await apiPut('/api/config/batch', data);
+                showStatus('✓ 已保存！', 'success');
+                showToast('配置已保存');
+            } catch (e) {
+                showStatus('✗ 保存失败', 'error');
+                showToast(e.message || '保存失败', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '保存修改';
+            }
+        }
+
+        function showStatus(msg, type) {
+            const el = document.getElementById('saveStatus');
+            el.textContent = msg;
+            el.className = `save-status ${type} show`;
+            
+            setTimeout(() => el.classList.remove('show'), 2500);
+        }
+    </script>
+</body>
+</html>

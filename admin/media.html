@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>媒体文件 - 王梓桐后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f0a0c8; --pink-deep: #e06090; --purple: #b088d0;
+            --bg: #fff8fb; --card: #ffffff;
+            --text: #333; --text-light: #888;
+            --border: rgba(240,160,200,.18);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'ZCOOL KuaiLe', -apple-system, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 240px; min-height: 100vh;
+            background: linear-gradient(180deg, #fff5f9, #fef5fa);
+            border-right: 1.5px solid var(--border);
+            padding: 24px 16px; position: fixed; left: 0; top: 0;
+            z-index: 100; display: flex; flex-direction: column;
+        }
+
+        .logo { text-align: center; padding-bottom: 20px; border-bottom: 1.5px solid var(--border); margin-bottom: 20px; }
+        .logo-icon { font-size: 2em; }
+        .logo-text { font-size: 1em; color: var(--pink-deep); margin-top: 6px; letter-spacing: 2px; }
+        
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item a {
+            display: flex; align-items: center; gap: 10px; padding: 13px 16px;
+            border-radius: 12px; color: var(--text-light); text-decoration: none;
+            font-size: 0.95em; transition: all 0.25s ease; margin-bottom: 4px;
+        }
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(240,160,200,.15), rgba(176,136,208,.1));
+            color: var(--pink-deep); transform: translateX(4px);
+        }
+        .nav-item .emoji { font-size: 1.3em; width: 26px; text-align: center; }
+
+        .user-info { padding-top: 16px; border-top: 1.5px solid var(--border); font-size: 0.85em; }
+        .user-name { color: var(--pink-deep); font-weight: bold; margin-bottom: 6px; }
+        .logout-btn { background: none; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 14px; cursor: pointer; font-family: inherit; font-size: 0.85em; color: var(--text-light); transition: all 0.25s ease; width: 100%; }
+        .logout-btn:hover { background: rgba(224,96,144,.08); color: var(--pink-deep); border-color: var(--pink); }
+
+        .main-content { flex: 1; margin-left: 240px; padding: 28px 36px; }
+        h2 { font-size: 2em; background: linear-gradient(135deg, var(--pink-deep), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; margin-bottom: 28px; }
+
+        /* 上传区域 */
+        .upload-zone {
+            border: 3px dashed var(--border); border-radius: 20px;
+            padding: 48px; text-align: center; cursor: pointer;
+            transition: all 0.3s ease; margin-bottom: 28px;
+            background: rgba(255,255,255,.7);
+        }
+        
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--pink-deep);
+            background: rgba(224,96,144,.04);
+        }
+
+        .upload-icon { font-size: 3.5em; margin-bottom: 14px; }
+        .upload-hint { font-size: 1.05em; color: var(--text-light); margin-bottom: 8px; }
+        .upload-types { font-size: 0.84em; color: var(--text-light); opacity: 0.7; }
+
+        input[type="file"] { display: none; }
+
+        /* 文件列表 */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 18px;
+        }
+
+        .media-card {
+            background: var(--card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1.5px solid var(--border);
+            transition: all 0.25s ease;
+        }
+
+        .media-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(240,160,200,.12);
+            border-color: var(--pink-deep);
+        }
+
+        .media-preview {
+            height: 150px;
+            object-fit: cover;
+            width: 100%;
+            background: #f5f5f5;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3em;
+        }
+
+        .media-preview img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .media-info {
+            padding: 12px 14px;
+        }
+
+        .media-name {
+            font-size: 0.88em; white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis; margin-bottom: 4px;
+        }
+
+        .media-meta {
+            font-size: 0.76em; color: var(--text-light);
+            display: flex; justify-content: space-between;
+        }
+
+        .media-actions {
+            padding: 0 14px 12px;
+            display: flex; gap: 6px;
+        }
+
+        .btn-sm {
+            flex: 1; background: var(--bg); border: 1.5px solid var(--border);
+            border-radius: 8px; padding: 6px; cursor: pointer;
+            font-family: inherit; font-size: 0.78em; color: var(--text-light);
+            transition: all 0.2s ease;
+        }
+
+        .btn-sm:hover { border-color: var(--pink-deep); color: var(--pink-deep); }
+        .btn-sm.danger:hover { border-color: #e05555; color: #e05555; }
+
+        .upload-progress {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 16px 28px; border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.15);
+            border: 1.5px solid var(--border); z-index: 999;
+            display: none;
+        }
+
+        .upload-progress.show { display: block; }
+
+        .progress-bar-bg {
+            width: 200px; height: 8px; background: #eee;
+            border-radius: 4px; overflow: hidden; margin-top: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 100%; background: linear-gradient(90deg, var(--pink-deep), var(--purple));
+            border-radius: 4px; transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; } .main-content { margin-left: 0; padding: 20px; }
+            .media-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        }
+
+        .toast-msg {
+            position: fixed; bottom: 28px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: white; padding: 12px 24px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.12);
+            border: 1.5px solid var(--border); z-index: 9999;
+            opacity: 0; transition: all 0.3s cubic-bezier(.68,-.55,.265,1.55);
+            display: flex; align-items: center; gap: 8px; font-size: 0.92em;
+        }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo"><div class="logo-icon">🌸</div><div class="logo-text">管理后台</div></div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/admin/dashboard.html"><span class="emoji">📊</span> 控制面板</a></li>
+            <li class="nav-item"><a href="/admin/profile.html"><span class="emoji">✏️</span> 编辑简介</a></li>
+            <li class="nav-item"><a href="/admin/quotes.html"><span class="emoji">💬</span> 名言管理</a></li>
+            <li class="nav-item"><a href="/admin/media.html" class="active"><span class="emoji">🖼️</span> 媒体文件</a></li>
+            <li class="nav-item"><a href="/admin/stats.html"><span class="emoji">📈</span> 访问统计</a></li>
+        </ul>
+        <div class="user-info">
+            <div class="user-name" id="displayName">管理员</div>
+            <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <h2>🖼️ 媒体文件管理</h2>
+
+        <!-- 上传区域 -->
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📁</div>
+            <p class="upload-hint">点击或拖拽文件到此处上传</p>
+            <p class="upload-types">支持：JPG / PNG / GIF / WEBP / MP4（图片最大5MB，视频最大50MB）</p>
+            <input type="file" id="fileInput" accept="image/*,video/mp4" onchange="handleUpload(this.files[0])">
+        </div>
+
+        <!-- 文件列表 -->
+        <div class="media-grid" id="mediaGrid">
+            <p style="grid-column:1/-1;color:var(--text-light);padding:40px;text-align:center;">加载中...</p>
+        </div>
+    </main>
+
+    <!-- 上传进度 -->
+    <div class="upload-progress" id="uploadProgress">
+        <div id="uploadFileName" style="font-weight:bold;margin-bottom:4px;">上传中...</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            setupDragDrop();
+            loadMediaList();
+        });
+
+        function setupDragDrop() {
+            const zone = document.getElementById('uploadZone');
+
+            ['dragenter', 'dragover'].forEach(e =>
+                zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.classList.add('dragover'); })
+            );
+
+            ['dragleave', 'drop'].forEach(e =>
+                zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.classList.remove('dragover'); })
+            );
+
+            zone.addEventListener('drop', (ev) => {
+                const file = ev.dataTransfer.files[0];
+                if (file) handleUpload(file);
+            });
+        }
+
+        async function handleUpload(file) {
+            if (!file) return;
+
+            // 检查类型
+            const isImage = file.type.startsWith('image/');
+            const isVideo = file.type === 'video/mp4';
+            
+            if (!isImage && !isVideo) {
+                showToast('只支持图片(JPG/PNG/GIF/WEBP)和MP4视频', 'error');
+                return;
+            }
+
+            // 检查大小
+            const maxSize = isImage ? 5 * 1024 * 1024 : 50 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showToast(`文件过大（${isImage?'图片':'视频'}最大${maxSize/1024/1024}MB）`, 'error');
+                return;
+            }
+
+            const endpoint = isVideo ? '/api/upload/video' : '/api/upload/image';
+
+            // 显示进度条
+            const progressEl = document.getElementById('uploadProgress');
+            const fillEl = document.getElementById('progressFill');
+            const nameEl = document.getElementById('uploadFileName');
+
+            progressEl.classList.add('show');
+            nameEl.textContent = file.name;
+            fillEl.style.width = '0%';
+
+            // 模拟进度（因为fetch无法获取真实上传进度）
+            let fakeProgress = 0;
+            const progressInterval = setInterval(() => {
+                fakeProgress += Math.random() * 30;
+                if (fakeProgress > 90) fakeProgress = 90;
+                fillEl.style.width = fakeProgress + '%';
+            }, 200);
+
+            try {
+                const result = await apiUpload(endpoint, file);
+
+                clearInterval(progressInterval);
+                fillEl.style.width = '100%';
+
+                showToast(`上传成功！${result.originalName}`);
+
+                setTimeout(() => {
+                    progressEl.classList.remove('show');
+                    loadMediaList();
+                }, 800);
+
+            } catch (e) {
+                clearInterval(progressInterval);
+                progressEl.classList.remove('show');
+                showToast(e.message || '上传失败', 'error');
+            }
+
+            document.getElementById('fileInput').value = '';
+        }
+
+        async function loadMediaList() {
+            try {
+                // 这里暂时用静态方式展示已存在的媒体
+                const container = document.getElementById('mediaGrid');
+
+                // 检查项目中的已知媒体文件
+                const knownFiles = [
+                    { name: 'avatar.jpg', type: 'image', path: '/avatar.jpg' },
+                    { name: 'bg_video.mp4', type: 'video', path: '/bg_video.mp4' },
+                    { name: 'bgm.mp3', type: 'audio', path: '/bgm.mp3' }
+                ];
+
+                if (!knownFiles.length) {
+                    container.innerHTML = '<p style="grid-column:1/-1;color:var(--text-light);padding:40px;text-align:center;">暂无媒体文件</p>';
+                    return;
+                }
+
+                container.innerHTML = knownFiles.map(f => `
+                    <div class="media-card">
+                        <div class="media-preview">
+                            ${f.type === 'image' 
+                                ? `<img src="${f.path}" alt="${f.name}" onerror="this.parentElement.innerHTML='🖼️'">` 
+                                : f.type === 'video' ? '🎬' : '🎵'}
+                        </div>
+                        <div class="media-info">
+                            <div class="media-name">${escapeHtml(f.name)}</div>
+                            <div class="media-media">${f.type.toUpperCase()}</div>
+                        </div>
+                        <div class="media-actions">
+                            <button class="btn-sm" onclick="window.open('${f.path}')">预览</button>
+                            <button class="btn-sm danger" onclick="showToast('系统文件不允许删除')">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+</html>

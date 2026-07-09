@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制面板 - 王梓桐后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f0a0c8; --pink-deep: #e06090; --purple: #b088d0;
+            --blue: #90c8f0; --green: #8ed4a0; --orange: #f0c080;
+            --bg: #fff8fb; --card: #ffffff;
+            --text: #333; --text-light: #888;
+            --border: rgba(240,160,200,.18);
+            --sidebar-bg: linear-gradient(180deg, #fff5f9, #fef5fa);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'ZCOOL KuaiLe', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ====== 侧边栏 ====== */
+        .sidebar {
+            width: 240px; min-height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1.5px solid var(--border);
+            padding: 24px 16px;
+            position: fixed;
+            left: 0; top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1.5px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon { font-size: 2em; }
+        .logo-text {
+            font-size: 1em; color: var(--pink-deep);
+            margin-top: 6px; letter-spacing: 2px;
+        }
+
+        .nav-menu { list-style: none; flex: 1; }
+        
+        .nav-item a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 16px;
+            border-radius: 12px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: all 0.25s ease;
+            margin-bottom: 4px;
+        }
+
+        .nav-item a:hover,
+        .nav-item a.active {
+            background: linear-gradient(135deg, rgba(240,160,200,.15), rgba(176,136,208,.1));
+            color: var(--pink-deep);
+            transform: translateX(4px);
+        }
+
+        .nav-item .emoji { font-size: 1.3em; width: 26px; text-align: center; }
+
+        .user-info {
+            padding-top: 16px;
+            border-top: 1.5px solid var(--border);
+            font-size: 0.85em;
+        }
+
+        .user-name {
+            color: var(--pink-deep); font-weight: bold;
+            margin-bottom: 6px;
+        }
+        
+        .logout-btn {
+            background: none; border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 8px 14px;
+            cursor: pointer; font-family: inherit;
+            font-size: 0.85em; color: var(--text-light);
+            transition: all 0.25s ease;
+            width: 100%;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(224,96,144,.08);
+            color: var(--pink-deep); border-color: var(--pink);
+        }
+
+        /* ====== 主内容区 ====== */
+        .main-content {
+            flex: 1; margin-left: 240px;
+            padding: 28px 36px;
+        }
+
+        .page-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: 2em;
+            background: linear-gradient(135deg, var(--pink-deep), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        /* ====== 统计卡片 ====== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px; margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 24px;
+            border: 1.5px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(240,160,200,.12);
+        }
+
+        .stat-emoji { font-size: 2.2em; margin-bottom: 10px; }
+        
+        .stat-value {
+            font-size: 2.4em; font-weight: bold;
+            background: linear-gradient(135deg, var(--pink-deep), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.88em; color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        /* ====== 快捷操作区 ====== */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 24px;
+            border: 1.5px solid var(--border);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover {
+            border-color: var(--pink-deep);
+            box-shadow: 0 8px 25px rgba(224,96,144,.12);
+            transform: translateY(-3px);
+        }
+
+        .action-title {
+            font-size: 1.2em; color: var(--pink-deep);
+            margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+        }
+
+        .action-desc { font-size: 0.88em; color: var(--text-light); line-height: 1.6; }
+
+        /* ====== 最近活动 ====== */
+        .recent-section {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 24px;
+            border: 1.5px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1.25em;
+            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .log-list { list-style: none; max-height: 300px; overflow-y: auto; }
+        
+        .log-item {
+            display: flex; justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(240,160,200,.08);
+            font-size: 0.88em;
+        }
+        
+        .log-action { color: var(--text); }
+        .log-time { color: var(--text-light); white-space: nowrap; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">🌸</div>
+            <div class="logo-text">管理后台</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/admin/dashboard.html" class="active"><span class="emoji">📊</span> 控制面板</a></li>
+            <li class="nav-item"><a href="/admin/profile.html"><span class="emoji">✏️</span> 编辑简介</a></li>
+            <li class="nav-item"><a href="/admin/quotes.html"><span class="emoji">💬</span> 名言管理</a></li>
+            <li class="nav-item"><a href="/admin/media.html"><span class="emoji">🖼️</span> 媒体文件</a></li>
+            <li class="nav-item"><a href="/admin/stats.html"><span class="emoji">📈</span> 访问统计</a></li>
+        </ul>
+
+        <div class="user-info">
+            <div class="user-name" id="displayName">管理员</div>
+            <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+        </div>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <div class="page-header">
+            <h2>控制面板</h2>
+            <span id="currentTime"></span>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-emoji">👁️</div>
+                <div class="stat-value" id="todayVisits">--</div>
+                <div class="stat-label">今日访问量</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-emoji">📊</div>
+                <div class="stat-value" id="totalVisits">--</div>
+                <div class="stat-label">总访问量（30天）</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-emoji">💬</div>
+                <div class="stat-value" id="quoteCount">--</div>
+                <div class="stat-label">名言数量</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-emoji">📁</div>
+                <div class="stat-value" id="mediaCount">--</div>
+                <div class="stat-label">媒体文件数</div>
+            </div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="quick-actions">
+            <a href="/admin/profile.html" class="action-card">
+                <div class="action-title">✏️ 编辑个人简介</div>
+                <div class="action-desc">修改网站名称、状态语、关于我的文字等内容</div>
+            </a>
+            <a href="/admin/quotes.html" class="action-card">
+                <div class="action-title">💬 管理首屏名言</div>
+                <div class="action-desc">添加、编辑或删除随机显示的名言</div>
+            </a>
+            <a href="/admin/media.html" class="action-card">
+                <div class="action-title">🖼️ 上传图片视频</div>
+                <div class="action-desc">更换头像、壁纸背景等媒体资源</div>
+            </a>
+            <a href="/admin/stats.html" class="action-card">
+                <div class="action-title">📈 查看访问统计</div>
+                <div class="action-desc">了解网站流量和热门页面数据</div>
+            </a>
+        </div>
+
+        <!-- 最近日志 -->
+        <div class="recent-section">
+            <h3 class="section-title">📋 最近操作记录</h3>
+            <ul class="log-list" id="logList">
+                <li class="log-item"><span class="log-action">加载中...</span><span class="log-time"></span></li>
+            </ul>
+        </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            loadDashboard();
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+
+        async function loadDashboard() {
+            try {
+                // 并行加载统计数据
+                const [visitsRes, quotesRes] = await Promise.all([
+                    apiGet('/api/stats/visits'),
+                    apiGet('/api/quotes')
+                ]);
+
+                document.getElementById('todayVisits').textContent = visitsRes.todayVisits || 0;
+                document.getElementById('totalVisits').textContent = visitsRes.totalVisits || 0;
+                document.getElementById('quoteCount').textContent = quotesRes.pagination?.total || quotesRes.data?.length || 0;
+
+                // 加载最近日志
+                const logsRes = await apiGet('/api/logs?limit=8');
+                renderLogs(logsRes.data || []);
+
+            } catch (e) {
+                console.error('加载失败:', e);
+            }
+        }
+
+        function renderLogs(logs) {
+            const list = document.getElementById('logList');
+            
+            if (!logs.length) {
+                list.innerHTML = '<li class="log-item"><span class="log-action">暂无操作记录</span><span class="log-time"></span></li>';
+                return;
+            }
+
+            list.innerHTML = logs.map(l => `
+                <li class="log-item">
+                    <span class="log-action">${escapeHtml(l.action)} · ${escapeHtml(l.target_type || '')} ${escapeHtml(l.details || '').slice(0,40)}</span>
+                    <span class="log-time">${formatTime(l.created_at)}</span>
+                </li>
+            `).join('');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${now.toTimeString().slice(0,8)}`;
+        }
+    </script>
+</body>
+</html>

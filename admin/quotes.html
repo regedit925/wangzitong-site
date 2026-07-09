@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名言管理 - 王梓桐后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f0a0c8; --pink-deep: #e06090; --purple: #b088d0;
+            --bg: #fff8fb; --card: #ffffff;
+            --text: #333; --text-light: #888;
+            --border: rgba(240,160,200,.18);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'ZCOOL KuaiLe', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            display: flex; min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px; min-height: 100vh;
+            background: linear-gradient(180deg, #fff5f9, #fef5fa);
+            border-right: 1.5px solid var(--border);
+            padding: 24px 16px; position: fixed; left: 0; top: 0;
+            z-index: 100; display: flex; flex-direction: column;
+        }
+
+        .logo { text-align: center; padding-bottom: 20px; border-bottom: 1.5px solid var(--border); margin-bottom: 20px; }
+        .logo-icon { font-size: 2em; }
+        .logo-text { font-size: 1em; color: var(--pink-deep); margin-top: 6px; letter-spacing: 2px; }
+
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 16px; border-radius: 12px;
+            color: var(--text-light); text-decoration: none;
+            font-size: 0.95em; transition: all 0.25s ease; margin-bottom: 4px;
+        }
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(135deg, rgba(240,160,200,.15), rgba(176,136,208,.1));
+            color: var(--pink-deep); transform: translateX(4px);
+        }
+        .nav-item .emoji { font-size: 1.3em; width: 26px; text-align: center; }
+
+        .user-info { padding-top: 16px; border-top: 1.5px solid var(--border); font-size: 0.85em; }
+        .user-name { color: var(--pink-deep); font-weight: bold; margin-bottom: 6px; }
+        .logout-btn {
+            background: none; border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 8px 14px; cursor: pointer;
+            font-family: inherit; font-size: 0.85em; color: var(--text-light);
+            transition: all 0.25s ease; width: 100%;
+        }
+        .logout-btn:hover { background: rgba(224,96,144,.08); color: var(--pink-deep); border-color: var(--pink); }
+
+        .main-content { flex: 1; margin-left: 240px; padding: 28px 36px; }
+
+        h2 {
+            font-size: 2em;
+            background: linear-gradient(135deg, var(--pink-deep), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 2px; margin-bottom: 28px;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--pink-deep), var(--purple));
+            color: white; border: none; border-radius: 12px;
+            padding: 12px 24px; font-size: 0.95em; font-family: inherit;
+            cursor: pointer; letter-spacing: 2px; transition: all 0.25s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(224,96,144,.3);
+        }
+
+        .search-box {
+            padding: 10px 18px; border: 2px solid var(--border);
+            border-radius: 12px; font-size: 0.92em; font-family: inherit;
+            width: 260px; outline: none; transition: all 0.25s ease;
+            background: var(--card);
+        }
+        
+        .search-box:focus { border-color: var(--pink-deep); box-shadow: 0 0 0 4px rgba(224,96,144,.08); }
+
+        /* 名言列表 */
+        .quote-list { display: flex; flex-direction: column; gap: 14px; }
+
+        .quote-card {
+            background: var(--card);
+            border-radius: 16px; padding: 20px 24px;
+            border: 1.5px solid var(--border);
+            display: flex; justify-content: space-between;
+            align-items: center;
+            transition: all 0.25s ease;
+        }
+
+        .quote-card:hover {
+            border-color: var(--pink-deep);
+            box-shadow: 0 6px 20px rgba(240,160,200,.1);
+        }
+
+        .quote-main { flex: 1; margin-right: 24px; }
+
+        .quote-text {
+            font-size: 1.08em; line-height: 1.7;
+            color: var(--text); margin-bottom: 6px;
+        }
+        
+        .quote-text em { color: var(--pink-deep); font-style: normal; }
+
+        .quote-source {
+            font-size: 0.86em; color: var(--text-light);
+        }
+
+        .quote-meta {
+            text-align: right; min-width: 100px;
+        }
+
+        .quote-order {
+            font-size: 1.5em; font-weight: bold;
+            color: var(--purple); opacity: 0.4;
+        }
+
+        .quote-actions { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+
+        .btn-icon {
+            background: var(--bg); border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 7px 14px;
+            cursor: pointer; font-family: inherit;
+            font-size: 0.82em; color: var(--text-light);
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover { border-color: var(--pink-deep); color: var(--pink-deep); background: rgba(240,96,144,.04); }
+        .btn-danger:hover { border-color: #e05555; color: #e05555; background: rgba(224,85,85,.04); }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,.35); z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.25s ease;
+        }
+        
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+
+        .modal-box {
+            background: white; border-radius: 20px;
+            padding: 32px; width: 520px; max-width: 92vw;
+            max-height: 85vh; overflow-y: auto;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(.68,-.55,.265,1.55);
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title { font-size: 1.4em; color: var(--pink-deep); margin-bottom: 24px; }
+
+        .form-field { margin-bottom: 18px; }
+        .form-field label { display: block; font-size: 0.9em; color: var(--text); margin-bottom: 6px; }
+
+        .form-field input,
+        .form-field textarea {
+            width: 100%; padding: 11px 15px; border: 2px solid var(--border);
+            border-radius: 11px; font-size: 0.95em; font-family: inherit;
+            background: var(--bg); outline: none; transition: all 0.25s ease;
+        }
+
+        .form-field textarea { min-height: 80px; resize: vertical; }
+
+        .form-field input:focus,
+        .form-field textarea:focus { border-color: var(--pink-deep); box-shadow: 0 0 0 4px rgba(224,96,144,.06); }
+
+        .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+        .btn-modal-cancel {
+            background: var(--bg); border: 1.5px solid var(--border);
+            border-radius: 11px; padding: 11px 24px; cursor: pointer;
+            font-family: inherit; font-size: 0.95em; color: var(--text-light);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; } .main-content { margin-left: 0; padding: 20px; }
+            .quote-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .quote-meta { text-align: left; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+            .quote-actions { justify-content: flex-start; margin-top: 0; }
+        }
+
+        .toast-msg {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: white; padding: 12px 24px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.12);
+            border: 1.5px solid var(--border); z-index: 9999;
+            opacity: 0; transition: all 0.3s cubic-bezier(.68,-.55,.265,1.55);
+            display: flex; align-items: center; gap: 8px; font-size: 0.92em;
+        }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo"><div class="logo-icon">🌸</div><div class="logo-text">管理后台</div></div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/admin/dashboard.html"><span class="emoji">📊</span> 控制面板</a></li>
+            <li class="nav-item"><a href="/admin/profile.html"><span class="emoji">✏️</span> 编辑简介</a></li>
+            <li class="nav-item"><a href="/admin/quotes.html" class="active"><span class="emoji">💬</span> 名言管理</a></li>
+            <li class="nav-item"><a href="/admin/media.html"><span class="emoji">🖼️</span> 媒体文件</a></li>
+            <li class="nav-item"><a href="/admin/stats.html"><span class="emoji">📈</span> 访问统计</a></li>
+        </ul>
+        <div class="user-info">
+            <div class="user-name" id="displayName">管理员</div>
+            <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <h2>💬 名言管理</h2>
+
+        <div class="toolbar">
+            <button class="btn-primary" onclick="openModal()">+ 新增名言</button>
+            <input type="text" class="search-box" id="searchBox" placeholder="搜索名言..." oninput="filterQuotes()">
+        </div>
+
+        <div class="quote-list" id="quoteList">
+            <p style="color:var(--text-light);padding:40px;text-align:center;">加载中...</p>
+        </div>
+    </main>
+
+    <!-- 编辑/新增弹窗 -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-box">
+            <h3 class="modal-title" id="modalTitle">新增名言</h3>
+            
+            <div class="form-field">
+                <label>名言内容（支持HTML标签）</label>
+                <textarea id="editText" placeholder='例如：雨纷纷，旧故里草木深<br>我听闻，你始终<em>一个人</em>'></textarea>
+                <small style="color:var(--text-light)">用 &lt;em&gt;&lt;/em&gt; 标签包裹要高亮的词</small>
+            </div>
+
+            <div class="form-field">
+                <label>来源/作者</label>
+                <input type="text" id="editSource" placeholder="例如：方文山 · 青花瓷">
+            </div>
+
+            <div class="form-field">
+                <label>高亮词（用于统计）</label>
+                <input type="text" id="editHighlight" placeholder="例如：一个人">
+            </div>
+
+            <input type="hidden" id="editId">
+
+            <div class="modal-buttons">
+                <button class="btn-modal-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-primary" onclick="saveQuote()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+        let quotesData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadQuotes();
+        });
+
+        async function loadQuotes() {
+            try {
+                const res = await apiGet('/api/quotes?limit=100');
+                quotesData = res.data || [];
+                renderQuotes(quotesData);
+            } catch (e) {
+                showToast(e.message || '加载失败', 'error');
+            }
+        }
+
+        function renderQuotes(data) {
+            const container = document.getElementById('quoteList');
+            
+            if (!data.length) {
+                container.innerHTML = '<p style="color:var(--text-light);padding:40px;text-align:center;">暂无名言，点击上方按钮添加吧～</p>';
+                return;
+            }
+
+            container.innerHTML = data.map((q, i) => `
+                <div class="quote-card" data-id="${q.id}">
+                    <div class="quote-main">
+                        <div class="quote-text">${q.text}</div>
+                        <div class="quote-source">${escapeHtml(q.source)} ${!q.is_active ? '<span style="color:#ccc">[已停用]</span>' : ''}</div>
+                    </div>
+                    <div class="quote-meta">
+                        <div class="quote-order">#${i + 1}</div>
+                        <div class="quote-actions">
+                            <button class="btn-icon" onclick="editQuote(${q.id})">编辑</button>
+                            <button class="btn-icon btn-danger" onclick="deleteQuote(${q.id})">删除</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterQuotes() {
+            const keyword = document.getElementById('searchBox').value.toLowerCase();
+            if (!keyword) return renderQuotes(quotesData);
+
+            const filtered = quotesData.filter(q =>
+                q.text.toLowerCase().includes(keyword) ||
+                q.source.toLowerCase().includes(keyword)
+            );
+            renderQuotes(filtered);
+        }
+
+        // 打开新增弹窗
+        function openModal() {
+            document.getElementById('modalTitle').textContent = '新增名言';
+            document.getElementById('editText').value = '';
+            document.getElementById('editSource').value = '';
+            document.getElementById('editHighlight').value = '';
+            document.getElementById('editId').value = '';
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        // 编辑名言
+        function editQuote(id) {
+            const q = quotesData.find(x => x.id === id);
+            if (!q) return;
+
+            document.getElementById('modalTitle').textContent = '编辑名言';
+            document.getElementById('editText').value = q.text.replace(/<br\s*\/?>/g, '\n');
+            document.getElementById('editSource').value = q.source || '';
+            document.getElementById('editHighlight').value = q.highlight_word || '';
+            document.getElementById('editId').value = q.id;
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        // 保存
+        async function saveQuote() {
+            const id = document.getElementById('editId').value;
+
+            const data = {
+                text: document.getElementById('editText').value.trim().replace(/\n/g, '<br>'),
+                source: document.getElementById('editSource').value.trim(),
+                highlight_word: document.getElementById('editHighlight').value.trim()
+            };
+
+            if (!data.text) { showToast('请填写名言内容', 'error'); return; }
+
+            try {
+                if (id) {
+                    await apiPut(`/api/quotes/${id}`, data);
+                    showToast('修改成功');
+                } else {
+                    await apiPost('/api/quotes', data);
+                    showToast('添加成功');
+                }
+
+                closeModal();
+                await loadQuotes();
+
+            } catch (e) {
+                showToast(e.message || '保存失败', 'error');
+            }
+        }
+
+        // 删除
+        async function deleteQuote(id) {
+            if (!confirmDialog('确认删除', '确定删除这条名言吗？此操作不可恢复。')) {
+                // 用户在confirmDialog的回调中执行
+                confirmDialog('确认删除', '确定删除这条名言吗？此操作不可恢复。', async () => {
+                    try {
+                        await apiDelete(`/api/quotes/${id}`);
+                        showToast('已删除');
+                        await loadQuotes();
+                    } catch (e) {
+                        showToast(e.message || '删除失败', 'error');
+                    }
+                });
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target === e.currentTarget) closeModal();
+        }
+    </script>
+</body>
+</html>
